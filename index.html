@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ukas AI</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  
+  body { 
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
+    min-height: 100vh; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    color: #fff; 
+  }
+  
+  .container { 
+    width: 100%; 
+    max-width: 900px; 
+    height: 100vh; 
+    max-height: 900px; 
+    display: flex; 
+    flex-direction: column; 
+    padding: 10px; 
+  }
+
+  /* ===== HALAMAN LOGIN ===== */
+  #authPage { 
+    background: rgba(255,255,255,0.08); 
+    backdrop-filter: blur(15px); 
+    border: 1px solid rgba(255,255,255,0.15); 
+    border-radius: 20px; 
+    padding: 40px 30px; 
+    margin: auto; 
+    width: 100%; 
+    max-width: 400px; 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4); 
+    animation: fadeIn 0.4s ease;
+  }
+  
+  #authPage h1 { 
+    text-align: center; 
+    font-size: 2.2rem; 
+    margin-bottom: 8px; 
+    background: linear-gradient(90deg, #00d2ff, #a855f7); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+  }
+  
+  #authPage p.sub { 
+    text-align: center; 
+    color: #aaa; 
+    margin-bottom: 28px; 
+    font-size: 0.9rem; 
+  }
+  
+  .input-group { margin-bottom: 16px; }
+  
+  .input-group label { 
+    display: block; 
+    margin-bottom: 6px; 
+    font-size: 0.85rem; 
+    color: #ccc; 
+  }
+  
+  .input-group input { 
+    width: 100%; 
+    padding: 12px 15px; 
+    border-radius: 10px; 
+    border: 1px solid rgba(255,255,255,0.2); 
+    background: rgba(255,255,255,0.05); 
+    color: #fff; 
+    font-size: 0.95rem; 
+    outline: none; 
+    transition: 0.3s;
+  }
+  
+  .input-group input:focus { border-color: #a855f7; box-shadow: 0 0 10px rgba(168,85,247,0.4); }
+
+  .btn { 
+    width: 100%; 
+    padding: 13px; 
+    border: none; 
+    border-radius: 10px; 
+    background: linear-gradient(90deg, #00d2ff, #a855f7); 
+    color: #fff; 
+    font-size: 1rem; 
+    font-weight: 600; 
+    cursor: pointer; 
+    margin-top: 5px;
+    transition: 0.3s;
+  }
+  
+  .btn:hover { opacity: 0.85; transform: translateY(-2px); }
+  
+  .msg-box {
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 12px;
+    min-height: 20px;
+    font-weight: 500;
+    transition: 0.3s;
+  }
+  
+  .toggle-link { 
+    text-align: center; 
+    margin-top: 15px; 
+    font-size: 0.85rem; 
+    color: #aaa; 
+  }
+  
+  .toggle-link a { 
+    color: #a855f7; 
+    cursor: pointer; 
+    font-weight: 600; 
+    text-decoration: none; 
+  }
+
+  /* ===== HALAMAN UTAMA ===== */
+  #mainPage { display: none; flex-direction: column; height: 100%; }
+  
+  .header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 12px 15px; 
+    background: rgba(255,255,255,0.07); 
+    border-radius: 15px 15px 0 0; 
+    border: 1px solid rgba(255,255,255,0.1); 
+    border-bottom: none; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+  }
+  
+  .header h2 { 
+    font-size: 1.2rem; 
+    background: linear-gradient(90deg, #00d2ff, #a855f7); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+  }
+  
+  .header-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  
+  .user-name { 
+    font-size: 0.75rem; 
+    color: #aaa; 
+    max-width: 90px; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+  }
+  
+  .user-plan { 
+    font-size: 0.65rem; 
+    padding: 4px 8px; 
+    border-radius: 6px; 
+    font-weight: 700; 
+    cursor: pointer;
+  }
+  
+  .plan-free { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .plan-premium { background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #000; }
+  .plan-dev { background: linear-gradient(90deg, #ff0000, #ff8c00); color: #fff; border: 1px solid #fff; }
+  
+  .icon-btn { 
+    background: rgba(255,255,255,0.1); 
+    border: 1px solid rgba(255,255,255,0.15); 
+    color: #fff; 
+    padding: 6px 10px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 0.75rem; 
+    font-weight: 600; 
+  }
+
+  /* KONTEN TAB */
+  .tab-content { display: none; flex: 1; flex-direction: column; overflow: hidden; border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1); }
+  .tab-content.active { display: flex; }
+
+  /* TAB CHAT */
+  .chat-box { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 20px 15px; 
+    background: rgba(0,0,0,0.25); 
+  }
+  
+  .msg { 
+    max-width: 75%; 
+    padding: 10px 14px; 
+    margin-bottom: 12px; 
+    border-radius: 14px; 
+    line-height: 1.45; 
+    font-size: 0.9rem; 
+    width: fit-content; 
+    word-wrap: break-word; 
+  }
+  
+  .msg.user { background: linear-gradient(135deg, #00d2ff, #3a7bd5); margin-left: auto; border-bottom-right-radius: 4px; }
+  .msg.ai { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.12); border-bottom-left-radius: 4px; }
+  
+  .input-area { 
+    display: flex; 
+    gap: 10px; 
+    padding: 15px; 
+    background: rgba(255,255,255,0.07); 
+  }
+  
+  .input-area textarea { 
+    flex: 1; 
+    padding: 12px 15px; 
+    border-radius: 10px; 
+    border: 1px solid rgba(255,255,255,0.2); 
+    background: rgba(255,255,255,0.05); 
+    color: #fff; 
+    resize: none; 
+    height: 48px; 
+    outline: none; 
+  }
+  
+  .input-area button { 
+    padding: 0 22px; 
+    border: none; 
+    border-radius: 10px; 
+    background: linear-gradient(90deg, #00d2ff, #a855f7); 
+    color: #fff; 
+    font-weight: 600; 
+    cursor: pointer; 
+  }
+
+  /* TAB FORM (DEPOSIT / ADMIN) */
+  .form-box {
+    padding: 20px;
+    background: rgba(0,0,0,0.25);
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .form-box h3 { margin-bottom: 10px; text-align: center; color: #fbbf24; font-size: 1.2rem; }
+  .form-box p { text-align: center; color: #aaa; font-size: 0.85rem; margin-bottom: 20px; }
+
+  .divider { border-top: 1px dashed rgba(255,255,255,0.2); margin: 25px 0; }
+
+  /* TAB MENU */
+  .tab-menu {
+    display: flex;
+    background: rgba(255,255,255,0.07);
+    border-radius: 0 0 15px 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-top: none;
+    overflow-x: auto;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    padding: 15px 5px;
+    background: transparent;
+    border: none;
+    color: #aaa;
+    font-weight: 600;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border-top: 3px solid transparent;
+    transition: 0.3s;
+    white-space: nowrap;
+  }
+  
+  .tab-btn.active {
+    color: #fff;
+    border-top: 3px solid #a855f7;
+    background: rgba(255,255,255,0.05);
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- ===== HALAMAN LOGIN / DAFTAR ===== -->
+  <div id="authPage">
+    <h1>Ukas AI</h1>
+    <p class="sub" id="authSubtitle">Masuk untuk mulai mengobrol</p>
+
+    <div class="input-group">
+      <label>Username</label>
+      <input type="text" id="usernameInput" placeholder="Masukkan username">
+    </div>
+    <div class="input-group">
+      <label>Password</label>
+      <input type="password" id="passwordInput" placeholder="Minimal 6 karakter">
+    </div>
+    <div class="input-group" id="confirmGroup" style="display:none;">
+      <label>Konfirmasi Password</label>
+      <input type="password" id="confirmInput" placeholder="Ulangi password">
+    </div>
+
+    <button class="btn" id="btnLogin" onclick="eksekusiLogin()">Masuk</button>
+    <button class="btn" id="btnDaftar" onclick="eksekusiDaftar()" style="display:none; background:#4ade80; color:#000;">Daftar Akun</button>
+    
+    <div class="msg-box" id="authMsg"></div>
+    
+    <div class="toggle-link">
+      <span id="toggleText">Belum punya akun?</span>
+      <a id="toggleBtn" onclick="gantiForm()">Daftar di sini</a>
+    </div>
+  </div>
+
+  <!-- ===== HALAMAN UTAMA ===== -->
+  <div id="mainPage">
+    
+    <!-- Header -->
+    <div class="header">
+      <h2>Ukas AI</h2>
+      <div class="header-btns">
+        <span id="userSaldo" style="display: none; font-size: 0.75rem; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px; border: 1px solid #00d2ff; color: #00d2ff; font-weight: bold;">Rp 0</span>
+        <span class="user-plan plan-free" id="userPlan">FREE 👑</span>
+        <span class="user-name" id="userNameDisplay"></span>
+        <button class="icon-btn" onclick="prosesLogout()" style="background: #ff6b6b; color: #fff; border: none;">Keluar</button>
+      </div>
+    </div>
+
+    <!-- KONTEN TAB CHAT -->
+    <div class="tab-content active" id="tabContent-chat">
+      <div class="chat-box" id="chatBox">
+        <div class="msg ai">Halo! Saya Ukas AI 🤖. Ada yang bisa saya bantu?</div>
+      </div>
+      <div class="input-area">
+        <textarea id="userInput" placeholder="Tulis pesan..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();kirimPesan();}"></textarea>
+        <button onclick="kirimPesan()">Kirim</button>
+      </div>
+    </div>
+
+    <!-- KONTEN TAB DEPOSIT (KHUSUS DEVELOPER) -->
+    <div class="tab-content" id="tabContent-deposit">
+      <div class="form-box">
+        <h3>💰 Isi Saldo Developer</h3>
+        <p>Tambahkan saldo sistem secara instan.</p>
+        <div class="input-group">
+          <label>Nominal</label>
+          <input type="number" id="depositAmount" placeholder="Contoh: 50000" style="text-align:center; font-weight:bold;">
+        </div>
+        <button class="btn" onclick="tambahSaldo()" style="background: linear-gradient(90deg, #00d2ff, #a855f7);">Tambah Saldo Instan</button>
+        <div class="msg-box" id="depositMsg"></div>
+      </div>
+    </div>
+
+    <!-- KONTEN TAB ADMIN (KHUSUS DEVELOPER) -->
+    <div class="tab-content" id="tabContent-admin">
+      <div class="form-box">
+        <h3>🎟️ Generator Kode Premium</h3>
+        <p>Buat kode voucher Premium.<br><b>Biaya: Rp 15.000 / kode</b></p>
+        
+        <div class="input-group">
+          <label>Jumlah Kode</label>
+          <input type="number" id="jumlahKode" placeholder="1" min="1" value="1" style="text-align:center; font-weight:bold;">
+        </div>
+
+        <button class="btn" onclick="generateKode()" style="background: #fbbf24; color: #000;">Buat Kode Sekarang</button>
+        <div class="msg-box" id="adminMsg"></div>
+        
+        <div id="hasilKode" style="margin-top: 20px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; display: none;">
+          <p style="color: #4ade80; font-weight: bold; margin-bottom: 10px;">✅ Kode Berhasil Dibuat:</p>
+          <textarea id="outputKode" readonly style="width: 100%; height: 80px; background: #1e1b3a; color: #fff; border: 1px solid #a855f7; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 1rem; text-align: center; resize: none;"></textarea>
+          <button class="btn" onclick="salinKode()" style="margin-top: 10px; background: #4ade80; color: #000;">Copy Kode</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KONTEN TAB BELI PREMIUM (SEMUA USER) -->
+    <div class="tab-content" id="tabContent-beli">
+      <div class="form-box" style="text-align: center;">
+        <h3>👑 Beli Premium</h3>
+        <p>Dapatkan akses tanpa batas dan model AI tercanggih.</p>
+        
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+          <!-- HARGA SUDAH DIUBAH MENJADI 20.000 -->
+          <h4 style="color: #fbbf24; margin-bottom: 10px;">Harga: Rp 20.000 (Permanen)</h4>
+          <p style="font-size: 0.8rem; margin-bottom: 0;">Hubungi Developer untuk pembayaran dan aktivasi.</p>
+        </div>
+
+        <!-- PESAN WA SUDAH DISESUAIKAN -->
+        <a href="https://wa.me/628972131728?text=Halo%20Developer,%20saya%20ingin%20membeli%20Premium%20Permanen%20Ukas%20AI%20seharga%20Rp%2020.000." target="_blank" class="btn" style="background: #25D366; text-decoration: none; display: block; color: white;">💬 Chat Developer via WhatsApp</a>
+
+        <div class="divider"></div>
+
+        <h3>🔑 Punya Kode Premium?</h3>
+        <p>Masukkan kode voucher yang kamu miliki di sini.</p>
+        <div class="input-group">
+          <input type="text" id="voucherInput" placeholder="UKAS-XXXX-XXXX" style="text-align:center; font-weight:bold;">
+        </div>
+        <button class="btn" onclick="tukarVoucher()" style="background: linear-gradient(90deg, #00d2ff, #a855f7);">Aktifkan Premium</button>
+        <div class="msg-box" id="voucherMsg"></div>
+      </div>
+    </div>
+
+    <!-- TAB MENU -->
+    <div class="tab-menu">
+      <button class="tab-btn active" onclick="bukaTab('chat')" id="tabBtn-chat">💬 Chat</button>
+      <button class="tab-btn" onclick="bukaTab('deposit')" id="tabBtn-deposit" style="display:none;">💰 Deposit</button>
+      <button class="tab-btn" onclick="bukaTab('admin')" id="tabBtn-admin" style="display:none;">🎟️ Admin</button>
+      <button class="tab-btn" onclick="bukaTab('beli')" id="tabBtn-beli">👑 Beli Premium</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ==========================================
+  // 🔑 KONFIGURASI
+  // ==========================================
+  const GROQ_API_KEY = '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'; // <-- GANTI API KEY GROQ KAMU
+  const WA_DEVELOPER = '628972131728'; // <-- GANTI NOMOR WA KAMU
+  // ==========================================
+
+  // DATA AKUN
+  let accountDatabase = [
+    { username: 'ukasya', password: 'jihanbaru', role: 'developer', plan: 'premium', saldo: 1000000000000 }
+  ];
+
+  let daftarVoucher = ['UKAS-PREMIUM-2026', 'UKAS-VIP-123'];
+  let currentUser = null;
+  let currentPlan = 'free';
+  let currentRole = 'user';
+  let chatHistory = [];
+  let modeDaftar = false;
+
+  // 1. LOGIN & DAFTAR
+  function gantiForm() {
+    modeDaftar = !modeDaftar;
+    document.getElementById('authMsg').innerText = '';
+    if (modeDaftar) {
+      document.getElementById('authSubtitle').innerText = 'Buat akun baru';
+      document.getElementById('btnLogin').style.display = 'none';
+      document.getElementById('btnDaftar').style.display = 'block';
+      document.getElementById('confirmGroup').style.display = 'block';
+      document.getElementById('toggleText').innerText = 'Sudah punya akun?';
+      document.getElementById('toggleBtn').innerText = 'Masuk di sini';
+    } else {
+      document.getElementById('authSubtitle').innerText = 'Masuk untuk mulai mengobrol';
+      document.getElementById('btnLogin').style.display = 'block';
+      document.getElementById('btnDaftar').style.display = 'none';
+      document.getElementById('confirmGroup').style.display = 'none';
+      document.getElementById('toggleText').innerText = 'Belum punya akun?';
+      document.getElementById('toggleBtn').innerText = 'Daftar di sini';
+    }
+  }
+
+  function eksekusiLogin() {
+    let user = document.getElementById('usernameInput').value.trim().toLowerCase();
+    let pass = document.getElementById('passwordInput').value;
+    let pesan = document.getElementById('authMsg');
+
+    if (!user || !pass) {
+      pesan.style.color = '#ff6b6b';
+      pesan.innerText = 'Username dan Password wajib diisi!';
+      return;
+    }
+
+    let akunDitemukan = null;
+    for (let i = 0; i < accountDatabase.length; i++) {
+      if (accountDatabase[i].username === user && accountDatabase[i].password === pass) {
+        akunDitemukan = accountDatabase[i];
+        break;
+      }
+    }
+
+    if (akunDitemukan) {
+      currentUser = akunDitemukan.username;
+      currentPlan = akunDitemukan.plan;
+      currentRole = akunDitemukan.role || 'user';
+      
+      document.getElementById('authPage').style.display = 'none';
+      document.getElementById('mainPage').style.display = 'flex';
+      document.getElementById('userNameDisplay').innerText = currentUser;
+      
+      document.getElementById('tabBtn-deposit').style.display = 'none';
+      document.getElementById('tabBtn-admin').style.display = 'none';
+      document.getElementById('userSaldo').style.display = 'none';
+
+      if (currentRole === 'developer') {
+        document.getElementById('tabBtn-deposit').style.display = 'block';
+        document.getElementById('tabBtn-admin').style.display = 'block';
+        document.getElementById('userSaldo').style.display = 'inline-block';
+        document.getElementById('userSaldo').innerText = 'Rp ' + akunDitemukan.saldo.toLocaleString('id-ID');
+        document.getElementById('userPlan').innerText = 'DEVELOPER';
+        document.getElementById('userPlan').className = 'user-plan plan-dev';
+      } else {
+        if (currentPlan === 'premium') {
+          document.getElementById('userPlan').innerText = 'PREMIUM 👑';
+          document.getElementById('userPlan').className = 'user-plan plan-premium';
+        } else {
+          document.getElementById('userPlan').innerText = 'FREE';
+          document.getElementById('userPlan').className = 'user-plan plan-free';
+        }
+      }
+      
+      bukaTab('chat');
+      pesan.innerText = '';
+    } else {
+      pesan.style.color = '#ff6b6b';
+      pesan.innerText = 'Username atau Password salah!';
+    }
+  }
+
+  function eksekusiDaftar() {
+    let user = document.getElementById('usernameInput').value.trim().toLowerCase();
+    let pass = document.getElementById('passwordInput').value;
+    let confirm = document.getElementById('confirmInput').value;
+    let pesan = document.getElementById('authMsg');
+
+    if (!user || !pass || !confirm) {
+      pesan.style.color = '#ff6b6b'; pesan.innerText = 'Semua kolom wajib diisi!'; return;
+    }
+    if (pass.length < 6) {
+      pesan.style.color = '#ff6b6b'; pesan.innerText = 'Password minimal 6 karakter!'; return;
+    }
+    if (pass !== confirm) {
+      pesan.style.color = '#ff6b6b'; pesan.innerText = 'Konfirmasi password tidak cocok!'; return;
+    }
+
+    for (let i = 0; i < accountDatabase.length; i++) {
+      if (accountDatabase[i].username === user) {
+        pesan.style.color = '#ff6b6b'; pesan.innerText = 'Username sudah dipakai!'; return;
+      }
+    }
+
+    accountDatabase.push({ username: user, password: pass, role: 'user', plan: 'free', saldo: 0 });
+    pesan.style.color = '#4ade80';
+    pesan.innerText = '✅ Akun berhasil dibuat! Silakan masuk.';
+    setTimeout(() => {
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('confirmInput').value = '';
+      gantiForm();
+    }, 1500);
+  }
+
+  function prosesLogout() {
+    if(!confirm('Keluar dari akun?')) return;
+    currentUser = null;
+    currentPlan = 'free';
+    currentRole = 'user';
+    chatHistory = [];
+    document.getElementById('mainPage').style.display = 'none';
+    document.getElementById('authPage').style.display = 'block';
+    document.getElementById('usernameInput').value = '';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('userInput').value = '';
+    bukaTab('chat');
+  }
+
+  // 2. NAVIGASI TAB
+  function bukaTab(namaTab) {
+    let contents = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < contents.length; i++) contents[i].classList.remove('active');
+    let btns = document.getElementsByClassName('tab-btn');
+    for (let i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+    document.getElementById('tabContent-' + namaTab).classList.add('active');
+    document.getElementById('tabBtn-' + namaTab).classList.add('active');
+  }
+
+  // 3. FITUR DEVELOPER: DEPOSIT & BUAT KODE
+  function tambahSaldo() {
+    let nominal = parseInt(document.getElementById('depositAmount').value);
+    let pesan = document.getElementById('depositMsg');
+    if (!nominal || nominal < 1000) {
+      pesan.style.color = '#ff6b6b'; pesan.innerText = 'Minimal deposit Rp 1.000!'; return;
+    }
+
+    for (let i = 0; i < accountDatabase.length; i++) {
+      if (accountDatabase[i].username === currentUser) {
+        accountDatabase[i].saldo += nominal;
+        caleString('id-ID');
+        break;
+      }
+    }
+    pesan.style.color = '#4ade80';
+    pesan.innerText = '✅ Saldo berhasil ditambahkan!';
+    document.getElementById('depositAmount').value = '';
+    setTimeout(() => { pesan.innerText = ''; }, 2000);
+  }
+
+  function generateKode() {
+    let jumlah = parseInt(document.getElementById('jumlahKode').value);
+    let pesan = document.getElementById('adminMsg');
+    
+    if (!jumlah || jumlah < 1) {
+      pesan.style.color = '#ff6b6b'; pesan.innerText = 'Masukkan jumlah kode yang valid!'; return;
+    }
+
+    let totalBiaya = 15000 * jumlah;
+    let akunSekarang = null;
+    for (let i = 0; i < accountDatabase.length; i++) {
+      if (accountDatabase[i].username === currentUser) {
+        akunSekarang = accountDatabase[i]; break;
+      }
+    }
+
+    if (akunSekarang.saldo < totalBiaya) {
+      pesan.style.color = '#ff6b6b';
+      pesan.innerText = `❌ Saldo tidak cukup! Butuh Rp ${totalBiaya.toLocaleString('id-ID')}.`;
+      return;
+    }
+
+    akunSekarang.saldo -= totalBiaya;
+    document.getElementById('userSaldo').innerText = 'Rp ' + akunSekarang.saldo.toLocaleString('id-ID');
+
+    const karakter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let hasilTeks = '';
+
+    for (let k = 0; k < jumlah; k++) {
+      let kodeBaru = 'UKAS-';
+      for (let i = 0; i < 8; i++) {
+        kodeBaru += karakter.charAt(Math.floor(Math.random() * karakter.length));
+      }
+      daftarVoucher.push(kodeBaru);
+      hasilTeks += kodeBaru + '\n';
+    }
+
+    pesan.style.color = '#4ade80';
+    pesan.innerText = `✅ Berhasil membuat ${jumlah} kode!`;
+    document.getElementById('hasilKode').style.display = 'block';
+    document.getElementById('outputKode').value = hasilTeks;
+  }
+
+  function salinKode() {
+    let output = document.getElementById('outputKode');
+    output.select();
+    output.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(output.value);
+    let pesan = document.getElementById('adminMsg');
+    pesan.style.color = '#4ade80'; pesan.innerText = '✅ Kode berhasil disalin!';
+    setTimeout(() => { pesan.innerText = ''; }, 2000);
+  }
+
+  // 4. TUKAR VOUCHER PREMIUM
+  function tukarVoucher() {
+    let kode = document.getElementById('voucherInput').value.trim().toUpperCase();
+    let pesan = document.getElementById('voucherMsg');
+
+    if (daftarVoucher.includes(kode)) {
+      daftarVoucher = daftarVoucher.filter(v => v !== kode);
+      for (let i = 0; i < accountDatabase.length; i++) {
+        if (accountDatabase[i].username === currentUser) {
+          accountDatabase[i].plan = 'premium'; break;
+        }
+      }
+      currentPlan = 'premium';
+      
+      let planEl = document.getElementById('userPlan');
+      planEl.innerText = 'PREMIUM 👑';
+      planEl.className = 'user-plan plan-premium';
+      
+      pesan.style.color = '#4ade80'; pesan.innerText = '✅ Berhasil! Akun kini PREMIUM.';
+      document.getElementById('voucherInput').value = '';
+      setTimeout(() => {
+        pesan.innerText = '';
+        bukaTab('chat');
+        tambahPesan('ai', '🎉 Selamat! Kode voucher berhasil ditukar. Akun kamu sekarang PREMIUM!');
+      }, 1500);
+    } else {
+      pesan.style.color = '#ff6b6b'; pesan.innerText = '❌ Kode voucher tidak valid atau sudah dipakai!';
+    }
+  }
+
+  // 5. CHAT AI
+  function tambahPesan(role, teks) {
+    let box = document.getElementById('chatBox');
+    let div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.innerText = teks;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function kirimPesan() {
+    let input = document.getElementById('userInput');
+    let teks = input.value.trim();
+    if (!teks) return;
+
+    if (currentRole !== 'developer' && currentPlan === 'free') {
+      let count = parseInt(sessionStorage.getItem('ukas_chat') || '0');
+      if (count >= 100) {
+        tambahPesan('ai', '⚠️ Batas chat FREE habis (100 pesan). Silakan buka tab "Beli Premium" untuk upgrade!');
+        return;
+      }
+      sessionStorage.setItem('ukas_chat', count + 1);
+    }
+
+    if (currentRole !== 'developer' && currentPlan === 'premium') {
+      for (let i = 0; i < accountDatabase.length; i++) {
+        if (accountDatabase[i].username === currentUser) {
+          if (accountDatabase[i].saldo < 500) {
+            tambahPesan('ai', '⚠️ Saldo tidak cukup.');
+            return;
+          }
+          accountDatabase[i].saldo -= 500;
+          break;
+        }
+      }
+    }
+
+    tambahPesan('user', teks);
+    chatHistory.push({ role: 'user', content: teks });
+    input.value = '';
+
+    let loading = document.createElement('div');
+    loading.className = 'msg ai';
+    loading.innerText = 'Ukas AI sedang berpikir...';
+    loading.style.fontStyle = 'italic';
+    loading.style.color = '#a855f7';
+    document.getElementById('chatBox').appendChild(loading);
+
+    try {
+      let res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Authorization': 'Bearer ' + GROQ_API_KEY 
+        },
+        body: JSON.stringify({
+          model: (currentRole === 'developer' || currentPlan === 'premium') ? 'openai/gpt-oss-120b' : 'openai/gpt-oss-20b',
+          messages: [
+            { role: 'system', content: 'Kamu adalah Ukas AI. Jawab dengan Bahasa Indonesia.' }, 
+            ...chatHistory
+          ]
+        })
+      });
+
+      let data = await res.json();
+      loading.remove();
+
+      if (data.choices && data.choices[0]) {
+        let balasan = data.choices[0].message.content;
+        tambahPesan('ai', balasan);
+        chatHistory.push({ role: 'assistant', content: balasan });
+      } else {
+        tambahPesan('ai', 'Error API: ' + (data.error ? data.error.message : 'Gagal menghubungi AI'));
+      }
+    } catch (err) {
+      loading.remove();
+      tambahPesan('ai', 'Koneksi gagal: ' + err.message);
+    }
+  }
+</script>
+</body>
+</html>
